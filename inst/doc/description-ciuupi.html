@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Paul Kabaila, Rheanna Mainzer and Ayesha Perera" />
+
+<meta name="date" content="2024-06-13" />
+
+<title>Description of ciuupi</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Description of ciuupi</h1>
+<h4 class="author">Paul Kabaila, Rheanna Mainzer and Ayesha Perera</h4>
+<h4 class="date">13 June 2024</h4>
+
+
+
+<div id="description-of-the-confidence-interval-that-utilizes-uncertain-prior-information-ciuupi" class="section level2">
+<h2>Description of the confidence interval that utilizes uncertain prior
+information (CIUUPI)</h2>
+<p>Suppose that <span class="math display">\[y = X \beta +
+\varepsilon,\]</span> where <span class="math inline">\(y\)</span> is a
+random <span class="math inline">\(n\)</span>-vector of responses, <span class="math inline">\(X\)</span> is a known <span class="math inline">\(n \times p\)</span> matrix with linearly
+independent columns, <span class="math inline">\(\beta\)</span> is an
+unknown parameter <span class="math inline">\(p\)</span>-vector, and
+<span class="math inline">\(\varepsilon \sim N(0, \, \sigma^2 \,
+I)\)</span>, with <span class="math inline">\(\sigma^2\)</span> assumed
+known. Suppose that the parameter of interest is <span class="math inline">\(\theta = a^{\top} \beta\)</span>. Let <span class="math inline">\(\tau = c^{\top} \beta - t = 0\)</span>, where
+<span class="math inline">\(a\)</span> and <span class="math inline">\(c\)</span> are specified linearly independent
+nonzero <span class="math inline">\(p\)</span>-vectors and <span class="math inline">\(t\)</span> is a specified number. Suppose that we
+have uncertain prior information that <span class="math inline">\(\tau =
+0\)</span>. Define the scaled expected length of a confidence interval
+to be <span class="math display">\[\frac{\text{expected length of this
+confidence interval}}
+{\text{expected length of the standard } 1-\alpha \text{ confidence
+interval for }\theta}.\]</span></p>
+<p>This package computes a confidence interval, with minimum coverage
+<span class="math inline">\(1 - \alpha\)</span>, for <span class="math inline">\(\theta\)</span> that utilizes the uncertain prior
+information that <span class="math inline">\(\tau = 0\)</span> in the
+following sense. This confidence interval has scaled expected length
+that (a) is substantially less 1 when <span class="math inline">\(\tau=0\)</span> and (b) has maximum value that is
+not too large. In addition, this confidence interval approaches the
+standard <span class="math inline">\(1-\alpha\)</span> confidence
+interval for <span class="math inline">\(\theta\)</span> when the data
+and the prior information are strongly discordant.</p>
+<p>Let <span class="math inline">\(\widehat{\beta}\)</span> denote the
+least squares estimator of <span class="math inline">\(\beta\)</span>.
+Then <span class="math inline">\(\widehat{\theta} = a^{\top}
+\widehat{\beta}\)</span> and <span class="math inline">\(\widehat{\tau}
+= c^{\top} \widehat{\beta} - t\)</span> are the least squares estimators
+of <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\tau\)</span>, respectively. Also let <span class="math inline">\(v_{\theta} = \text{Var}(\widehat{\theta})/\sigma^2
+= a^{\top} (X^{\top}X)^{-1}a\)</span> and <span class="math inline">\(v_{\tau} = \text{Var}(\widehat{\tau})/\sigma^2 =
+c^{\top} (X^{\top}X)^{-1}c\)</span>. The known correlation between <span class="math inline">\(\widehat{\theta}\)</span> and <span class="math inline">\(\widehat{\tau}\)</span> is <span class="math inline">\(\rho = a^{\top} (X^{\top}X)^{-1}c / (v_{\theta} \,
+v_{\tau})^{1/2}\)</span>. Let <span class="math inline">\(\gamma = \tau
+/ (\sigma \, v_{\tau}^{1/2})\)</span> and <span class="math inline">\(\hat{\gamma} = \hat{\tau}/(\sigma \,
+v_{\tau}^{1/2})\)</span>. The confidence interval for <span class="math inline">\(\theta\)</span> that utilizes uncertain prior
+information that <span class="math inline">\(\tau=0\)</span> has the
+form <span class="math display">\[
+\text{CI}(b,s)
+=\left[ \hat{\theta} - v_{\theta}^{1/2} \, \sigma \, b(\hat{\gamma}) -
+v_{\theta}^{1/2} \, \sigma \, s(\hat{\gamma}), \, \hat{\theta} -
+v_{\theta}^{1/2} \, \sigma \, b(\hat{\gamma}) + v_{\theta}^{1/2} \,
+\sigma \, s(\hat{\gamma}) \right],
+\]</span> where <span class="math inline">\(b: \mathbb{R} \rightarrow
+\mathbb{R}\)</span> is an odd continuous function and <span class="math inline">\(s: \mathbb{R} \rightarrow [0, \infty)\)</span> is
+an even continuous function. In addition, <span class="math inline">\(b(x)=0\)</span> and <span class="math inline">\(s(x)= z_{1-\alpha/2}\)</span> for all <span class="math inline">\(|x| \ge d\)</span>, where <span class="math inline">\(z_{1-\alpha/2}\)</span> denotes the <span class="math inline">\(1 - \alpha/2\)</span> quantile of the standard
+normal distribution. For given <span class="math inline">\(d &gt;
+0\)</span> and positive integer <span class="math inline">\(q\)</span>,
+let <span class="math inline">\(h = d / q\)</span> and specify the
+functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> by the <span class="math inline">\((2q
+- 1)\)</span>-vector <span class="math display">\[\Big(b(h),...,b((q-1)h),
+s(0),s(h)...,s((q-1)h)\Big).\]</span> The values of <span class="math inline">\(b(kh)\)</span> and <span class="math inline">\(s(kh)\)</span> for <span class="math inline">\(k=-q,\dots,q\)</span> are deduced from this vector
+using the assumptions made about the functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span>. The values of <span class="math inline">\(b(x)\)</span> and <span class="math inline">\(s(x)\)</span> for any <span class="math inline">\(x \in [-d,d]\)</span> are found via cubic spline
+interpolation using the values of <span class="math inline">\(b(kh)\)</span> and <span class="math inline">\(s(kh)\)</span> for <span class="math inline">\(k=-q,\dots,q\)</span>. This is through natural
+(default) or clamped cubic spline interpolation.</p>
+<p>Version 1.0 of ciuupi was described by Mainzer and Kabaila (2019),
+who chose <span class="math inline">\(d = 6\)</span> and <span class="math inline">\(q = 6\)</span>. However, it was subsequently found
+that this choice is no longer adequate when <span class="math inline">\(\alpha\)</span> is very small and/or <span class="math inline">\(|\rho|\)</span> is close to 1. Extensive numerical
+explorations have been used to find a formula (in terms of <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(|\rho|\)</span>) for a ‘goldilocks’ value of <span class="math inline">\(d\)</span> that is neither too large nor too
+small. Version 1.2 uses this formula and sets <span class="math inline">\(q = \lceil d/0.75 \rceil\)</span> and <span class="math inline">\(h = d/q\)</span>.</p>
+<p>The confidence interval that utilizes the uncertain prior information
+(CIUUPI) is found by computing the value of the vector <span class="math inline">\(\big(b(h),...,b((q-1)h),
+s(0),s(h)...,s((q-1)h)\big)\)</span>, such that the confidence interval
+<span class="math inline">\(\text{CI}(b,s)\)</span> has minimum coverage
+probability <span class="math inline">\(1 - \alpha\)</span> and the
+desired scaled expected length properties. The method used is an obvious
+extension of that described by Mainzer and Kabaila (2019). However,
+version 1.2 employs a far more efficient algorithm for the computation
+of <span class="math inline">\(\lambda^*\)</span>, which forms part of
+the computation of the CIUUPI.</p>
+<p>This confidence interval has the following three practical
+applications. Firstly, if <span class="math inline">\(\sigma^2\)</span>
+has been accurately estimated from previous data then it may be treated
+as being effectively known. Secondly, for sufficiently large <span class="math inline">\(n - p\)</span> (<span class="math inline">\(n-p
+\ge 30\)</span>, say), if we replace the assumed known value of <span class="math inline">\(\sigma^2\)</span> by its usual estimator in the
+formula for the confidence interval then the resulting interval has, to
+a very good approximation, the same coverage probability and expected
+length properties as when <span class="math inline">\(\sigma^2\)</span>
+is known. Thirdly, some more complicated models can be approximated by
+the linear regression model with <span class="math inline">\(\sigma^2\)</span> known when certain unknown
+parameters are replaced by estimates (see e.g. Kabaila and Mainzer,
+2019).</p>
+</div>
+<div id="functions-in-this-package" class="section level2">
+<h2>Functions in this package</h2>
+<p>We attach the package <code>ciuupi</code> using</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(ciuupi)</span></code></pre></div>
+<p>We illustrate the application of the functions in the package using
+the real-life example described in Discussion 5.8 on p.3426 of Kabaila
+and Giri (2009). This example is obtained by extracting a <span class="math inline">\(2 \times 2\)</span> factorial data set from the
+<span class="math inline">\(2^3\)</span> factorial data set described in
+Table 7.5 of Box et al. (1963). The resulting design matrix <span class="math inline">\(X\)</span> is specified by the command</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>x1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), x1, x2, x1<span class="sc">*</span>x2)</span></code></pre></div>
+<p>A description of the parameter of interest and the uncertain prior
+information is given in Discussion 5.8 on p.3426 of Kabaila and Giri
+(2009). The parameter of interest is <span class="math inline">\(\theta
+= a^{\top} \beta\)</span>, where the column vector <span class="math inline">\(a\)</span> is specified by the command</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">2</span>)</span></code></pre></div>
+<p>The uncertain prior information is that the two-factor interaction
+term is zero i.e. <span class="math inline">\(\tau = 0\)</span>, where
+<span class="math inline">\(\tau = c^{\top} \beta\)</span> and the
+column vector <span class="math inline">\(c\)</span> is specified by the
+command</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+<div id="acx_to_rho" class="section level3">
+<h3><code>acX_to_rho</code></h3>
+<p>To compute the CIUUPI, we need to first compute the known correlation
+<span class="math inline">\(\rho\)</span> between <span class="math inline">\(\widehat{\theta}\)</span> and <span class="math inline">\(\widehat{\tau}\)</span>, given by <span class="math inline">\(\rho = a^{\top} (X^{\top}X)^{-1}c \big /
+\big(a^{\top} (X^{\top}X)^{-1}a \, c^{\top} (X^{\top}X)^{-1}c
+\big)^{1/2}\)</span>. This is done using the function
+<code>acX_to_rho</code> as follows.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Compute rho</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">acX_to_rho</span>(a, c, X)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">print</span>(rho)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] -0.7071068</span></span></code></pre></div>
+<p>The exact value of <span class="math inline">\(\rho\)</span> is <span class="math inline">\(-1/\sqrt{2}\)</span>.</p>
+</div>
+<div id="compute-the-functions-b-and-s-that-specify-the-ciuupi" class="section level3">
+<h3>Compute the functions <span class="math inline">\(b\)</span> and
+<span class="math inline">\(s\)</span> that specify the CIUUPI</h3>
+</div>
+<div id="bs_ciuupi" class="section level3">
+<h3><code>bs_ciuupi</code></h3>
+<p>The function <code>bs_ciuupi</code> is the “engine” of the package.
+The CIUUPI is required to have minimum coverage probability <span class="math inline">\(1 - \alpha\)</span>, for some <span class="math inline">\(\alpha\)</span> specified by the user of the
+package. The functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> of the CIUUPI are determined by <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\rho\)</span>. Suppose that <span class="math inline">\(\alpha = 0.05\)</span>. The functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> can be specified either by natural
+cubic spline interpolation (natural=1) or by clamped cubic spline
+interpolation (natural=0). By default, natural=1. For this default, the
+list that specifies the functions <span class="math inline">\(b\)</span>
+and <span class="math inline">\(s\)</span> of the CIUUPI is computed
+using the following command</p>
+<p>bs.list.example &lt;- bs_ciuupi(alpha, rho)</p>
+<p>This command takes about 5 minutes to run and so
+<code>bs.list.example</code> has been stored as data for quick
+access.</p>
+<p>We can specify the functions <span class="math inline">\(b\)</span>
+and <span class="math inline">\(s\)</span> by clamped cubic spline
+interpolation as follows. The list that specifies the functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> of the CIUUPI is computed using the
+following command</p>
+<p>bs_ciuupi(alpha, rho, natural = 0)</p>
+<p>This command takes about 45 minutes to run and leads to almost
+identical functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> of the CIUUPI as when bs_ciuupi(alpha,
+rho) is used.</p>
+<p>The output of <code>bs_ciuupi</code> is a list that includes the
+element bsvec, which is the vector <span class="math display">\[\Big(b(h),...,b((q-1)h),
+s(0),s(h)...,s((q-1)h)\Big)\]</span> that, using cubic spline
+interpolation, determines the functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> that specify the CIUUPI for all
+possible values of <span class="math inline">\(\sigma\)</span> and
+observed response vector <span class="math inline">\(y\)</span>. We
+stress that bsvec does NOT depend on either <span class="math inline">\(\sigma\)</span> or the observed response vector
+<span class="math inline">\(y\)</span>. The graphs of the functions
+<span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span> are plotted using the functions
+<code>plot_b</code> and <code>plot_s</code>, respectively.</p>
+</div>
+<div id="plot-the-graphs-of-the-functions-b-and-s" class="section level3">
+<h3>Plot the graphs of the functions <span class="math inline">\(b\)</span> and <span class="math inline">\(s\)</span></h3>
+</div>
+<div id="plot_b-and-plot_s" class="section level3">
+<h3><code>plot_b</code> and <code>plot_s</code></h3>
+<p>We plot the graph of the odd function <span class="math inline">\(b\)</span> of the CIUUPI using</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">plot_b</span>(bs.list.example)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>We plot of the graph of the even function <span class="math inline">\(s\)</span> of the CIUUPI using</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">plot_s</span>(bs.list.example)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-performance-of-the-ciuupi" class="section level3">
+<h3>The performance of the CIUUPI</h3>
+<p>Define the scaled expected length of the CIUUPI to be the expected
+length of the CIUUPI divided by the expected length of the standard
+<span class="math inline">\(1 - \alpha\)</span> confidence interval for
+<span class="math inline">\(\theta\)</span>, given by <span class="math display">\[
+\left[ \hat{\theta} - z_{1-\alpha/2} \, v_{\theta}^{1/2} \, \sigma, \,
+\hat{\theta} + z_{1-\alpha/2} \, v_{\theta}^{1/2} \, \sigma \right].
+\]</span> The performance of the CIUUPI is assessed by its coverage
+probability and its squared scaled expected length.</p>
+</div>
+<div id="plot_cp-and-plot_squared_sel" class="section level3">
+<h3><code>plot_cp</code> and <code>plot_squared_sel</code></h3>
+<p>The coverage probability of the CIUUPI is an even function of the
+unknown parameter <span class="math inline">\(\gamma\)</span>. We plot
+the graph of the coverage probability minus <span class="math inline">\(1 - \alpha\)</span>, as a function of <span class="math inline">\(|\gamma|\)</span>, using</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">plot_cp</span>(bs.list.example)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>The scaled expected length of the CIUUPI is an even function of the
+unknown parameter <span class="math inline">\(\gamma\)</span>. The
+squared scaled expected length may be interpreted as the following
+measure of efficiency of the standard <span class="math inline">\(1-\alpha\)</span> confidence interval for <span class="math inline">\(\theta\)</span> relative to the CIUUPI with
+minimum coverage <span class="math inline">\(1-\alpha\)</span>. For a
+given large sample size used to find the the standard <span class="math inline">\(1-\alpha\)</span> confidence interval for <span class="math inline">\(\theta\)</span>, it is the sample size required by
+the CIUUPI with minimum coverage <span class="math inline">\(1-\alpha\)</span> divided by the sample size used
+to find the standard <span class="math inline">\(1-\alpha\)</span>
+confidence interval for <span class="math inline">\(\theta\)</span> to
+achieve the same expected length, for the specified value of <span class="math inline">\(\gamma\)</span>.</p>
+<p>We plot the graph of the squared scaled expected length, as a
+function of <span class="math inline">\(|\gamma|\)</span>, using</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">plot_squared_sel</span>(bs.list.example)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" />
+### Computation of the observed value of the CIUUPI</p>
+<p>Now we introduce the additional information provided by <span class="math inline">\(\sigma^2\)</span> and the observed response vector
+<span class="math inline">\(y\)</span>. This permits us to compute the
+observed value of the CIUUPI and also to compute the standard <span class="math inline">\(1 - \alpha\)</span> confidence interval for <span class="math inline">\(\theta\)</span>.</p>
+</div>
+<div id="ciuupi_observed_value-and-ci_standard" class="section level3">
+<h3><code>ciuupi_observed_value</code> and <code>ci_standard</code></h3>
+<p>For this example, the observed response vector <span class="math inline">\(y\)</span> is (87.2, 88.4, 86.7, 89.2) and the
+known value of <span class="math inline">\(\sigma\)</span> is 0.8. We
+specify these values using the following commands</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">87.2</span>, <span class="fl">88.4</span>, <span class="fl">86.7</span>, <span class="fl">89.2</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>sig <span class="ot">&lt;-</span> <span class="fl">0.8</span></span></code></pre></div>
+<p>The uncertain prior information is that <span class="math inline">\(\tau = 0\)</span>, where <span class="math inline">\(\tau = c^{\top} \beta - t\)</span>, with <span class="math inline">\(t = 0\)</span>. The observed value of the CIUUPI
+is computed and printed using the following commands</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="fu">ciuupi_observed_value</span>(a, c, X, alpha, bs.list.example, t, y, <span class="at">sig =</span> sig)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt;             lower    upper</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; ciuupi -0.7696589 3.221789</span></span></code></pre></div>
+<p>For comparison, the standard <span class="math inline">\(1-\alpha\)</span> confidence interval for <span class="math inline">\(\theta\)</span>, with <span class="math inline">\(\alpha = 0.05\)</span>, is computed and printed
+using the following commands</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">ci_standard</span>(a, X, y, alpha, sig)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt;              lower    upper</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; standard -1.017446 3.417446</span></span></code></pre></div>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Box, G.E.P., Connor, L.R., Cousins, W.R., Davies, O.L., Hinsworth,
+F.R., Sillitto, G.P. (1963) The Design and Analysis of Industrial
+Experiments, 2nd edition, reprinted. Oliver and Boyd, London.</p>
+<p>Kabaila, P. and Mainzer, R. (2019). An alternative to confidence
+intervals constructed after a Hausman pretest in panel data. <a href="doi:10.1111/anzs.12278" class="uri">doi:10.1111/anzs.12278</a></p>
+<p>Mainzer, R. and Kabaila, P. (2019). ciuupi: An R package for
+computing confidence intervals that utilize uncertain prior information.
+<a href="doi:10.32614/RJ-2019-026" class="uri">doi:10.32614/RJ-2019-026</a></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

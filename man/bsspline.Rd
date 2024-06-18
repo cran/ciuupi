@@ -2,77 +2,51 @@
 % Please edit documentation in R/bsspline.R
 \name{bsspline}
 \alias{bsspline}
-\title{Evaluate the functions b and s at x}
+\title{Evaluate the functions \eqn{b} and \eqn{s} at \code{x}}
 \usage{
-bsspline(x, bsvec, alpha, natural = 1)
+bsspline(x, bsvec, alpha, d, n.ints, natural)
 }
 \arguments{
-\item{x}{A value or vector of values at which the functions b and s
-are to be evaluated}
+\item{x}{A value or vector of values at which the functions \eqn{b}
+and \eqn{s} are to be evaluated}
 
-\item{bsvec}{The vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5))}
+\item{bsvec}{The \eqn{(2q-1)}-vector
+\deqn{\big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h) \big),}
+where \eqn{q}=ceiling(\eqn{d}/0.75) and \eqn{h=d/q}.
+This vector specifies the CIUUPI, for all possible values of the random
+error variance and the observed response vector}
 
-\item{alpha}{The minimum coverage probability is 1 - \code{alpha}}
+\item{alpha}{The desired minimum coverage probability is \eqn{1 - \alpha}}
 
-\item{natural}{Equal to 1 (default) for natural cubic spline interpolation
-or 0 for clamped cubic spline interpolation}
+\item{d}{The functions \eqn{b} and \eqn{s} are specified by cubic splines
+on the interval \eqn{[-d, d]}}
+
+\item{n.ints}{The number of equal-length intervals in \eqn{[0, d]}, where
+the endpoints of these intervals specify the knots,
+belonging to \eqn{[0, d]}, of the cubic spline interpolations
+that specify the functions \eqn{b} and \eqn{s}. In the description
+of \code{bsvec}, \code{n.ints} is also called \eqn{q}.}
+
+\item{natural}{Equal to 1 (default) if the \eqn{b} and \eqn{s} functions are obtained by
+natural cubic spline interpolation or 0 if obtained by clamped cubic spline
+interpolation}
 }
 \value{
 A data frame containing \code{x} and the corresponding values of the
-functions b and s.
+functions \eqn{b} and \eqn{s}.
 }
 \description{
-Evaluate the functions b and s, as specified by (b(1),b(2),...,b(5),s(0),s(1),...,s(5)),
-\code{alpha} and \code{natural}, at \code{x}.
-}
-\details{
-The function b is an odd continuous function and the function s is an even
-continuous function. In addition, b(x)=0 and s(x) is equal to the
-\eqn{1 - \alpha/2}
-quantile of the standard normal distribution for all |x| greater than
-or equal to 6. The values of these functions in the interval \eqn{[-6,6]}
-are specified by the vector \eqn{(b(1), b(2), \dots, b(5),s(0), s(1), \dots, s(5))}
-as follows. By assumption, \eqn{b(0)=0}
-and \eqn{b(-i)=-b(i)}
-and \eqn{s(-i)=s(i)} for \eqn{i=1,...,6}.
-The values of \eqn{b(x)} and \eqn{s(x)} for any \eqn{x} in the interval \eqn{[-6,6]}
-are found using cube spline interpolation for the given values of \eqn{b(i)}
-and \eqn{s(i)} for \eqn{i=-6,-5,...,0,1,...,5,6}.
-
-
-The vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5)) that specifies the confidence interval
-that utilizes uncertain prior information (CIUUPI) is obtained using \code{\link{bsciuupi}}.
+Evaluate the functions \eqn{b} and \eqn{s}, as specified by
+\code{bsvec},
+\code{alpha}, \code{d}, \code{n.ints} and \code{natural}, at \code{x}.
 }
 \examples{
-alpha <- 0.05
+x <- seq(0, 8, by = 1)
+alpha <- bs.list.example$alpha
+natural <- bs.list.example$natural
+d <- bs.list.example$d
+n.ints <- bs.list.example$n.ints
+bsvec <- bs.list.example$bsvec
+bs <- bsspline(x, bsvec, alpha, d, n.ints, natural)
 
-# Find the vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5)) that specifies the
-# CIUUPI: (this may take a few minutes to run)
-\donttest{
-bsvec <- bsciuupi(alpha, rho = 0.4)
-}
-
-# The result (to 7 decimal places) is
-bsvec <- c(0.129443483, 0.218926703, 0.125880945, 0.024672734, -0.001427343,
-           1.792489585, 1.893870240, 2.081786492, 2.080407355,  1.986667246,
-           1.958594824)
-
-# Graph the functions b and s
-x <- seq(0, 8, by = 0.1)
-xseq <- seq(0, 6, by = 1)
-bvec <- c(0, bsvec[1:5], 0)
-quantile <- qnorm(1-(alpha)/2, 0, 1)
-svec <- c(bsvec[6:11], quantile)
-splineval <- bsspline(x, bsvec, alpha)
-
-plot(x, splineval[, 2], type = "l", main = "b function",
-ylab = " ", las = 1, lwd = 2, xaxs = "i", col = "blue")
-points(xseq, bvec, pch = 19, col = "blue")
-plot(x, splineval[, 3], type = "l", main = "s function",
-ylab = " ", las = 1, lwd = 2, xaxs = "i",  col = "blue")
-points(xseq, svec, pch = 19, col = "blue")
-
-}
-\seealso{
-\code{\link{bsciuupi}}, \code{\link{ciuupi}}
 }

@@ -2,95 +2,74 @@
 #'
 #' Evaluate the scaled expected length of the confidence interval that
 #' utilizes uncertain prior information (CIUUPI) at \code{gam}.
+#' This scaled expected length is defined to be the expected length of the
+#' CIUUPI divided
+#' by the expected length of the standard \eqn{1 - \alpha} confidence interval.
+#' The input \code{bs.list} determines the functions \eqn{b} and \eqn{s}
+#' that specify the confidence interval that utilizes the uncertain
+#' prior information (CIUUPI), for all possible values of \eqn{\sigma}
+#' and observed response vector.
 #'
-#' @param gam A value of gamma or vector of gamma values at which
-#' the scaled expected length function is evaluated
-#' @param bsvec The vector (b(1),...,b(5),s(0),...,s(5)) that specifies the CIUUPI
-#' @param a A vector used to specify the parameter of interest
-#' @param c A vector used to specify the parameter about which
-#' we have uncertain prior information
-#' @param x The n by p design matrix
-#' @param rho A known correlation
-#' @param alpha The minimum coverage probability is 1 - \code{alpha}
-#' @param natural Equal to 1 (default) if the functions b and s are obtained by natural cubic
-#' spline interpolation or 0 if obtained by clamped cubic spline interpolation
+#' @param gam A value of \eqn{\gamma} or vector of \eqn{\gamma} values at which
+#' the coverage probability function is evaluated
+#'
+#' @param n.nodes The number of nodes for the Gauss Legendre quadrature used for
+#' the evaluation of the scaled expected length
+#'
+#' @param bs.list A list that includes the following
+#' components.
+#'
+#' \code{alpha}: \eqn{1 - \alpha} is the desired minimum coverage probability of the
+#' confidence interval
+#'
+#' \code{rho}: The known correlation \eqn{\rho} between
+#' \eqn{\widehat{\theta}} and \eqn{\widehat{\tau}}
+#
+#'
+#' \code{natural}: 1 when the functions \eqn{b} and \eqn{s} are
+#'          specified by natural cubic spline interpolation
+#'          or 0 if these functions are specified by clamped
+#'          cubic spline interpolation
+#'
+#' \code{d}: the functions \eqn{b} and \eqn{s} are specified by
+#'    cubic splines on the interval \eqn{[-d, d]}
+#'
+#' \code{n.ints}: number of equal-length intervals in \eqn{[0, d]}, where
+#'         the endpoints of these intervals specify the knots,
+#'         belonging to \eqn{[0, d]}, of the cubic spline interpolations
+#'         that specify the functions \eqn{b} and \eqn{s}. In the description
+#'         of \code{bsvec}, \code{n.ints} is also called \eqn{q}.
+#'
+#' \code{bsvec}: the \eqn{(2q-1)}-vector
+#'       \deqn{\big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h)\big),}
+#'       where \eqn{q}=ceiling(\eqn{d}/0.75) and \eqn{h=d/q}.
 #'
 #' @return The value(s) of the scaled expected length at \code{gam}.
 #'
-#' @details
-#'
-#' Suppose that \deqn{y = X \beta + \epsilon} where \eqn{y} is a random \eqn{n}-vector of
-#' responses, \eqn{X} is a known \eqn{n} by \eqn{p} matrix with linearly
-#' independent columns, \eqn{\beta} is an unknown parameter \eqn{p}-vector and
-#' \eqn{\epsilon} is the random error with components that are iid normally distributed
-#' with zero mean and known variance.
-#' The parameter of interest is \eqn{\theta = } \code{a}' \eqn{\beta}. The uncertain
-#' prior information is that \eqn{\tau = } \code{c}' \eqn{\beta} -
-#' \code{t} = 0, where \code{a}
-#' and \code{c} are specified linearly independent vectors and \code{t} is a specified number.
-#'  \code{rho} is the known
-#' correlation between the least squares estimators of \eqn{\theta} and \eqn{\tau}.
-#' The user must specify either \code{a}, \code{c} and \code{x} or
-#' \code{rho}.  If \code{a}, \code{c} and \code{x} are specified then
-#' \code{rho} is computed.
-#'
-#' The CIUUPI is specified by the vector (b(1),...,b(5),s(0),...,s(5)), \code{alpha} and \code{natural}
-#'
-#' The scaled expected length is defined as the expected length of the
-#' CIUUPI divided
-#' by the expected length of the standard confidence interval with the same minimum coverage probability.
-#'
-#' @seealso
-#' \code{\link{ciuupi}}, \code{\link{bsciuupi}}
-#'
-#' @examples
-#' alpha <- 0.05
-#'
-#' # Find the vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5)) that specifies the
-#' # CIUUPI: (this may take a few minutes to run)
-#' \donttest{
-#' bsvec <- bsciuupi(alpha, rho = 0.4)
-#' }
-#'
-#' # The result (to 7 decimal places) is
-#' bsvec <- c(0.129443483, 0.218926703, 0.125880945, 0.024672734, -0.001427343,
-#'            1.792489585, 1.893870240, 2.081786492, 2.080407355,  1.986667246,
-#'            1.958594824)
-#'
-#' # Graph the scaled expected length function
-#' gam <- seq(0, 8, by = 0.1)
-#' sel <- selciuupi(gam, bsvec, alpha, rho = 0.4)
-#' plot(gam, sel, type = "l", lwd = 2, ylab = "", las = 1, xaxs = "i",
-#' main = "Scaled Expected Length", col = "blue",
-#' xlab = expression(paste("|", gamma, "|")))
-#' abline(h = 1, lty = 2)
 #'
 #' @export
-
-selciuupi <- function(gam, bsvec, alpha, natural = 1, rho = NULL, a, c, x){
+#'
+#' @examples
+#' \donttest{gam <- seq(0, 10, by = 0.2)
+#' n.nodes <- 10
+#' sel <- selciuupi(gam, n.nodes, bs.list.example)}
+#'
+selciuupi <- function(gam, n.nodes, bs.list){
   # Use this program to compute the scaled expected length of the
-  # new confidence interval.
+  # CIUUPI.
   #
   # Written by R Mainzer, September 2017
+  # Revised by P. Kabaila in June 2024
 
-  # Compute rho
-  if(is.null(rho)){
+  # Find the nodes and weights of the Gauss Legendre quadrature
+  quad.info <- statmod::gauss.quad(n.nodes, kind="legendre")
 
-    # Do the QR decomposition of the X matrix and find X transpose X inverse
-    qrstr <- qr(x)
-    R <- qr.R(qrstr)
-    XTXinv <- chol2inv(R)
-
-    # Compute rho
-    rho <- (t(a) %*% XTXinv %*% c) / sqrt( t(a) %*% XTXinv %*% a %*% t(c) %*% XTXinv %*% c)
-    rho <- as.numeric(rho)
-
-  }
-
-  # The following inputs are needed here
-  d <- 6
-  n.ints <- 6
-  n.nodes <- 5
+  alpha <- bs.list$alpha
+  rho <- bs.list$rho
+  natural <- bs.list$natural
+  d <- bs.list$d
+  n.ints <- bs.list$n.ints
+  bsvec <- bs.list$bsvec
 
   # Specify the function s
   c.alpha <- stats::qnorm(1 - alpha/2)
@@ -99,9 +78,9 @@ selciuupi <- function(gam, bsvec, alpha, natural = 1, rho = NULL, a, c, x){
   # Compute the scaled expected length
   res <- rep(0, length(gam))
   for(i in 1:length(gam)){
-    res[i] <- compute_sel(gam[i], bsvec, d, n.ints, n.nodes, alpha, s.spl)
+    res[i] <- compute_sel_v1(gam[i], bsvec, d, n.ints, quad.info, c.alpha, s.spl)
   }
 
-  out <- res
+  res
 
 }

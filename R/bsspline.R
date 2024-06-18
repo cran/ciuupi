@@ -1,74 +1,76 @@
-#' Evaluate the functions b and s at x
+#' Evaluate the functions \eqn{b} and \eqn{s} at \code{x}
 #'
-#' Evaluate the functions b and s, as specified by (b(1),b(2),...,b(5),s(0),s(1),...,s(5)),
-#' \code{alpha} and \code{natural}, at \code{x}.
+#' Evaluate the functions \eqn{b} and \eqn{s}, as specified by
+#' \code{bsvec},
+#' \code{alpha}, \code{d}, \code{n.ints} and \code{natural}, at \code{x}.
 #'
-#' @param x A value or vector of values at which the functions b and s
-#' are to be evaluated
-#' @param bsvec The vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5))
-#' @param alpha The minimum coverage probability is 1 - \code{alpha}
-#' @param natural Equal to 1 (default) for natural cubic spline interpolation
-#' or 0 for clamped cubic spline interpolation
+#' @param x A value or vector of values at which the functions \eqn{b}
+#' and \eqn{s} are to be evaluated
+#'
+#' @param bsvec  The \eqn{(2q-1)}-vector
+#'       \deqn{\big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h) \big),}
+#'       where \eqn{q}=ceiling(\eqn{d}/0.75) and \eqn{h=d/q}.
+#'       This vector specifies the CIUUPI, for all possible values of the random
+#'       error variance and the observed response vector
+#'
+#' @param alpha The desired minimum coverage probability is \eqn{1 - \alpha}
+#'
+#' @param d The functions \eqn{b} and \eqn{s} are specified by cubic splines
+#' on the interval \eqn{[-d, d]}
+#'
+#' @param n.ints The number of equal-length intervals in \eqn{[0, d]}, where
+#'         the endpoints of these intervals specify the knots,
+#'         belonging to \eqn{[0, d]}, of the cubic spline interpolations
+#'         that specify the functions \eqn{b} and \eqn{s}. In the description
+#'         of \code{bsvec}, \code{n.ints} is also called \eqn{q}.
+#'
+#' @param natural Equal to 1 (default) if the \eqn{b} and \eqn{s} functions are obtained by
+#' natural cubic spline interpolation or 0 if obtained by clamped cubic spline
+#' interpolation
 #'
 #' @return A data frame containing \code{x} and the corresponding values of the
-#' functions b and s.
-#'
-#' @details The function b is an odd continuous function and the function s is an even
-#' continuous function. In addition, b(x)=0 and s(x) is equal to the
-#' \eqn{1 - \alpha/2}
-#' quantile of the standard normal distribution for all |x| greater than
-#' or equal to 6. The values of these functions in the interval \eqn{[-6,6]}
-#' are specified by the vector \eqn{(b(1), b(2), \dots, b(5),s(0), s(1), \dots, s(5))}
-#' as follows. By assumption, \eqn{b(0)=0}
-#' and \eqn{b(-i)=-b(i)}
-#' and \eqn{s(-i)=s(i)} for \eqn{i=1,...,6}.
-#' The values of \eqn{b(x)} and \eqn{s(x)} for any \eqn{x} in the interval \eqn{[-6,6]}
-#' are found using cube spline interpolation for the given values of \eqn{b(i)}
-#' and \eqn{s(i)} for \eqn{i=-6,-5,...,0,1,...,5,6}.
-#'
-#'
-#' The vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5)) that specifies the confidence interval
-#' that utilizes uncertain prior information (CIUUPI) is obtained using \code{\link{bsciuupi}}.
-#'
-#' @seealso
-#' \code{\link{bsciuupi}}, \code{\link{ciuupi}}
-#'
-#' @examples
-#' alpha <- 0.05
-#'
-#' # Find the vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5)) that specifies the
-#' # CIUUPI: (this may take a few minutes to run)
-#' \donttest{
-#' bsvec <- bsciuupi(alpha, rho = 0.4)
-#' }
-#'
-#' # The result (to 7 decimal places) is
-#' bsvec <- c(0.129443483, 0.218926703, 0.125880945, 0.024672734, -0.001427343,
-#'            1.792489585, 1.893870240, 2.081786492, 2.080407355,  1.986667246,
-#'            1.958594824)
-#'
-#' # Graph the functions b and s
-#' x <- seq(0, 8, by = 0.1)
-#' xseq <- seq(0, 6, by = 1)
-#' bvec <- c(0, bsvec[1:5], 0)
-#' quantile <- qnorm(1-(alpha)/2, 0, 1)
-#' svec <- c(bsvec[6:11], quantile)
-#' splineval <- bsspline(x, bsvec, alpha)
-#'
-#' plot(x, splineval[, 2], type = "l", main = "b function",
-#' ylab = " ", las = 1, lwd = 2, xaxs = "i", col = "blue")
-#' points(xseq, bvec, pch = 19, col = "blue")
-#' plot(x, splineval[, 3], type = "l", main = "s function",
-#' ylab = " ", las = 1, lwd = 2, xaxs = "i",  col = "blue")
-#' points(xseq, svec, pch = 19, col = "blue")
+#' functions \eqn{b} and \eqn{s}.
 #'
 #' @export
+#'
+#' @examples
+#' x <- seq(0, 8, by = 1)
+#' alpha <- bs.list.example$alpha
+#' natural <- bs.list.example$natural
+#' d <- bs.list.example$d
+#' n.ints <- bs.list.example$n.ints
+#' bsvec <- bs.list.example$bsvec
+#' bs <- bsspline(x, bsvec, alpha, d, n.ints, natural)
+#'
+bsspline <- function(x, bsvec, alpha, d, n.ints, natural){
+  # This module computes the values of the functions b
+  # and s for the vector x of values, whose elements are
+  # assumed to be in increasing order.
+  #
+  # Inputs
+  # x: a vector of values, whose elements are assumed
+  #    to be in increasing order
+  # bsvec: the vector (b(d/n.ints),...,b((n.ints-1)d/n.ints),
+  #                s(0),s(d/n.ints)...,s((n.ints-1)d/n.ints))
+  #    For d=6 and n.ints=6, this vector is
+  #    (b(1),...,b(5),s(0),...,s(5)).
+  # alpha: the desired minimum coverage is 1 - alpha
+  # d: the functions b and s are specified by
+  #    cubic splines on the interval [-d, d]
+  # n.ints: number of equal-length intervals in [0, d], where
+  #         the endpoints of these intervals specify the knots,
+  #         belonging to [0,d], of the cubic spline interpolations
+  #         that specify the functions b and s
+  # natural: 1 when the functions b and s are
+  #          specified by natural cubic spline interpolation
+  #          or 0 if these functions are specified by clamped
+  #          cubic spline interpolation.
+  # Output
+  # A data frame with x, values of b and values of s
+  #
+  # Written by P. Kabaila in January 2023, based
+  # on earlier R code of R. Mainzer from 2017
 
-bsspline <- function(x, bsvec, alpha, natural = 1){
-
-  # Set input
-  d <- 6
-  n.ints <- 6
   c.alpha <- stats::qnorm(1 - alpha/2)
 
   # Find b and s functions
@@ -82,6 +84,6 @@ bsspline <- function(x, bsvec, alpha, natural = 1){
   bspl.res <- c(rep(0, length(x1)), bspl(x2), rep(0, length(x3)))
   sspl.res <- c(rep(c.alpha, length(x1)), sspl(x2), rep(c.alpha, length(x3)))
 
-  out <- data.frame(x = x, b = bspl.res, s = sspl.res)
+  data.frame(x = x, b = bspl.res, s = sspl.res)
 
 }

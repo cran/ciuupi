@@ -4,28 +4,41 @@
 \alias{cpciuupi}
 \title{Compute the coverage probability of the CIUUPI}
 \usage{
-cpciuupi(gam, bsvec, alpha, natural = 1, rho = NULL, a, c, x)
+cpciuupi(gam, n.nodes, bs.list)
 }
 \arguments{
-\item{gam}{A value of gamma or vector of gamma values at which
+\item{gam}{A value of \eqn{\gamma} or vector of values of \eqn{\gamma} at which
 the coverage probability function is evaluated}
 
-\item{bsvec}{The vector (b(1),...,b(5),s(0),...,s(5)) that specifies the CIUUPI}
+\item{n.nodes}{The number of nodes for the Gauss Legendre quadrature used for
+the evaluation of the coverage probability}
 
-\item{alpha}{The nominal coverage probability is 1 - \code{alpha}}
+\item{bs.list}{A list that includes the following
+components.
 
-\item{natural}{Equal to 1 (default) if the b and s functions are obtained by
-natural cubic spline interpolation or 0 if obtained by clamped cubic spline
-interpolation}
+\code{alpha}: \eqn{1 - \alpha} is the desired minimum coverage probability of the
+confidence interval
 
-\item{rho}{A known correlation}
+\code{rho}: The known correlation \eqn{\rho} between
+\eqn{\widehat{\theta}} and \eqn{\widehat{\tau}}
 
-\item{a}{A vector used to specify the parameter of interest}
+\code{natural}: 1 when the functions \eqn{b} and \eqn{s} are
+specified by natural cubic spline interpolation
+or 0 if these functions are specified by clamped
+cubic spline interpolation
 
-\item{c}{A vector used to specify the parameter about which
-we have uncertain prior information}
+\code{d}: the functions \eqn{b} and \eqn{s} are specified by
+cubic splines on the interval \eqn{[-d, d]}
 
-\item{x}{The n by p design matrix}
+\code{n.ints}: number of equal-length intervals in \eqn{[0, d]}, where
+the endpoints of these intervals specify the knots,
+belonging to \eqn{[0, d]}, of the cubic spline interpolations
+that specify the functions \eqn{b} and \eqn{s}. In the description
+of \code{bsvec}, \code{n.ints} is also called \eqn{q}.
+
+\code{bsvec}: the \eqn{(2q-1)}-vector
+\deqn{\big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h)\big),}
+where \eqn{q}=ceiling(\eqn{d}/0.75) and \eqn{h=d/q}.}
 }
 \value{
 The value(s) of the coverage probability of the CIUUPI at \code{gam}.
@@ -33,48 +46,14 @@ The value(s) of the coverage probability of the CIUUPI at \code{gam}.
 \description{
 Evaluate the coverage probability of the confidence interval that
 utilizes uncertain prior information (CIUUPI) at \code{gam}.
-}
-\details{
-Suppose that \deqn{y = X \beta + \epsilon} where \eqn{y} is a random \eqn{n}-vector of
-responses, \eqn{X} is a known \eqn{n} by \eqn{p} matrix with linearly
-independent columns, \eqn{\beta} is an unknown parameter \eqn{p}-vector and
-\eqn{\epsilon} is the random error with components that are iid normally distributed
-with zero mean and known variance.
-The parameter of interest is \eqn{\theta = } \code{a}' \eqn{\beta}. The uncertain
-prior information is that \eqn{\tau = } \code{c}' \eqn{\beta} -
-\code{t} = 0, where \code{a}
-and \code{c} are specified linearly independent vectors and \code{t} is a specified number.
- \code{rho} is the known
-correlation between the least squares estimators of \eqn{\theta} and \eqn{\tau}.
-The user must specify either \code{a}, \code{c} and \code{x} or
-\code{rho}.  If \code{a}, \code{c} and \code{x} are specified then
-\code{rho} is computed.
-
-The CIUUPI is specified by the vector (b(1),...,b(5),s(0),...,s(5)), \code{alpha} and \code{natural}
+The input \code{bs.list} determines the functions \eqn{b} and \eqn{s}
+that specify the confidence interval that utilizes the uncertain
+prior information (CIUUPI), for all possible values of \eqn{\sigma}
+and observed response vector.
 }
 \examples{
-alpha <- 0.05
+\donttest{gam <- seq(0, 10, by = 0.2)
+n.nodes <- 10
+cp <- cpciuupi(gam, n.nodes, bs.list.example)}
 
-# Find the vector (b(1),b(2),...,b(5),s(0),s(1),...,s(5)) that specifies the
-# CIUUPI: (this may take a few minutes to run)
-\donttest{
-bsvec <- bsciuupi(alpha, rho = 0.4)
-}
-
-# The result (to 7 decimal places) is
-bsvec <- c(0.129443483, 0.218926703, 0.125880945, 0.024672734, -0.001427343,
-           1.792489585, 1.893870240, 2.081786492, 2.080407355,  1.986667246,
-           1.958594824)
-
-# Graph the coverage probability function
-gam <- seq(0, 10, by = 0.1)
-cp <- cpciuupi(gam, bsvec, alpha, rho = 0.4)
-plot(gam, cp, type = "l", lwd = 2, ylab = "", las = 1, xaxs = "i",
-main = "Coverage Probability", col = "blue",
-xlab = expression(paste("|", gamma, "|")), ylim = c(0.94999, 0.95001))
-abline(h = 1-alpha, lty = 2)
-
-}
-\seealso{
-\code{\link{ciuupi}}, \code{\link{bsciuupi}}
 }

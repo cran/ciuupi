@@ -1,0 +1,264 @@
+---
+title: "Description of ciuupi"
+author: "Paul Kabaila, Rheanna Mainzer and Ayesha Perera"
+date: "13 June 2024"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Description of ciuupi}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Description of the confidence interval that utilizes uncertain prior information (CIUUPI)
+
+Suppose that $$y = X \beta + \varepsilon,$$ where $y$ is a random $n$-vector of responses, $X$ is a known $n \times p$ matrix with linearly independent columns, $\beta$ is an unknown parameter $p$-vector, and  $\varepsilon \sim N(0, \, \sigma^2 \, I)$, with $\sigma^2$ assumed known. Suppose that the parameter of interest is $\theta = a^{\top} \beta$. Let $\tau = c^{\top} \beta - t = 0$, where $a$ and $c$ are specified linearly independent nonzero $p$-vectors and $t$ is a specified number. Suppose that we have uncertain prior information that $\tau = 0$. Define the scaled expected length of a confidence interval to be
+$$\frac{\text{expected length of this confidence interval}}
+{\text{expected length of the standard } 1-\alpha \text{ confidence interval for }\theta}.$$
+
+This package computes a confidence interval, with minimum coverage $1 - \alpha$, for $\theta$ that utilizes the uncertain prior information that $\tau = 0$ in the following sense. 
+This confidence interval has scaled expected length that (a) is substantially less 1 when $\tau=0$ and (b) has maximum value that is not too large. In addition, this confidence interval
+approaches the standard $1-\alpha$ confidence interval for $\theta$ when the data and the prior information are strongly discordant. 
+
+
+Let $\widehat{\beta}$ denote the least squares estimator of $\beta$.  Then $\widehat{\theta} = a^{\top} \widehat{\beta}$ and $\widehat{\tau} = c^{\top} \widehat{\beta} - t$ are the least squares estimators of $\theta$ and $\tau$, respectively.  Also let $v_{\theta} = \text{Var}(\widehat{\theta})/\sigma^2 = a^{\top} (X^{\top}X)^{-1}a$ and $v_{\tau} = \text{Var}(\widehat{\tau})/\sigma^2 = c^{\top} (X^{\top}X)^{-1}c$. The known correlation between $\widehat{\theta}$ and $\widehat{\tau}$
+is $\rho = a^{\top} (X^{\top}X)^{-1}c / (v_{\theta} \, v_{\tau})^{1/2}$. Let 
+$\gamma = \tau / (\sigma \, v_{\tau}^{1/2})$ and $\hat{\gamma} = \hat{\tau}/(\sigma \, v_{\tau}^{1/2})$.  The confidence interval for $\theta$ that utilizes uncertain prior information that $\tau=0$  has the form
+$$
+\text{CI}(b,s)
+=\left[ \hat{\theta} - v_{\theta}^{1/2} \, \sigma \, b(\hat{\gamma}) - v_{\theta}^{1/2} \, \sigma \, s(\hat{\gamma}), \, \hat{\theta} - v_{\theta}^{1/2} \, \sigma \, b(\hat{\gamma}) + v_{\theta}^{1/2} \, \sigma \, s(\hat{\gamma}) \right],
+$$
+where $b: \mathbb{R} \rightarrow \mathbb{R}$ is an odd continuous function and $s: \mathbb{R} \rightarrow [0, \infty)$ is an even continuous function. In addition, $b(x)=0$ and $s(x)= z_{1-\alpha/2}$ for all $|x| \ge d$, where 
+$z_{1-\alpha/2}$ denotes the $1 - \alpha/2$ quantile of the standard normal distribution. For given $d > 0$ and positive integer $q$, let $h = d / q$ and specify the functions 
+$b$ and $s$ by the $(2q - 1)$-vector
+$$\Big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h)\Big).$$
+The values of $b(kh)$ and $s(kh)$ for $k=-q,\dots,q$ are deduced from this vector using the assumptions made about
+the functions $b$ and $s$.
+The values of $b(x)$ and $s(x)$ for any $x \in [-d,d]$ are  found via cubic spline interpolation using the
+values of $b(kh)$ and $s(kh)$ for $k=-q,\dots,q$.
+This is through natural (default) or clamped cubic
+ spline interpolation.
+ 
+ Version 1.0 of ciuupi was described by Mainzer and Kabaila (2019), who chose $d = 6$ and 
+ $q = 6$. However, it was subsequently found that this choice is no longer adequate when $\alpha$ is very small and/or $|\rho|$ is close to 1. Extensive numerical explorations have been used to find a formula
+(in terms of $\alpha$ and $|\rho|$) for a 'goldilocks' value of $d$
+that is neither too large nor too small. Version 1.2 uses this formula and sets
+$q = \lceil d/0.75 \rceil$ and $h = d/q$.
+
+The confidence interval that utilizes the uncertain prior information (CIUUPI) is found by computing the value of 
+the vector $\big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h)\big)$, such
+that the confidence interval $\text{CI}(b,s)$ has 
+minimum coverage probability $1 - \alpha$ and the desired scaled expected length properties. 
+The method used is an obvious extension of that described by Mainzer and Kabaila (2019). However, version 1.2 employs a far more efficient algorithm for the computation of $\lambda^*$, which forms part of the computation of the CIUUPI.
+
+
+This confidence interval has the following three practical applications. Firstly,
+if $\sigma^2$ has been accurately estimated from previous data
+then it may be treated as being effectively known. Secondly, for 
+sufficiently large $n - p$ ($n-p \ge 30$, say),
+if we replace the assumed known value of $\sigma^2$ by its usual estimator 
+in the formula for the confidence interval then 
+the resulting interval has, to a very good approximation, the same 
+coverage probability and expected length properties as when $\sigma^2$ is known. 
+Thirdly, some more complicated models
+can be approximated by the linear regression model with $\sigma^2$ known when 
+certain unknown parameters are replaced by estimates (see 
+e.g. Kabaila and Mainzer, 2019). 
+
+
+## Functions in this package
+
+We attach the package `ciuupi` using
+
+```{r setup}
+library(ciuupi)
+```
+
+
+We illustrate the application of the functions in the package using the real-life example
+described in Discussion 5.8 on p.3426 of Kabaila and Giri (2009). This example is obtained by
+extracting a $2 \times 2$ factorial data set from the $2^3$ factorial data set 
+described in Table 7.5 of Box et al. (1963). The resulting design matrix $X$ is specified by the command
+
+```{r}
+x1 <- c(-1, 1, -1, 1)
+x2 <- c(-1, -1, 1, 1)
+X <- cbind(rep(1, 4), x1, x2, x1*x2)
+```
+
+
+A description of the parameter of interest and the uncertain prior information is given in Discussion 5.8 on p.3426 of Kabaila and Giri (2009). The parameter of interest is
+$\theta = a^{\top} \beta$, where the column vector $a$ is specified by the command
+
+
+```{r}
+a <- c(0, 2, 0, -2)
+```
+
+The uncertain prior information is that the two-factor interaction term is zero i.e. $\tau = 0$, where $\tau = c^{\top} \beta$ and 
+the column vector $c$ is specified by the command
+
+```{r}
+c <- c(0, 0, 0, 1)
+```
+### `acX_to_rho`
+
+To compute the CIUUPI, we need to first compute 
+the known correlation $\rho$ between $\widehat{\theta}$ and $\widehat{\tau}$, given by $\rho = a^{\top} (X^{\top}X)^{-1}c \big / \big(a^{\top} (X^{\top}X)^{-1}a \, c^{\top} (X^{\top}X)^{-1}c \big)^{1/2}$. This is done using the function `acX_to_rho` as follows.
+
+```{r}
+# Compute rho
+rho <- acX_to_rho(a, c, X)
+print(rho)
+```
+The exact value of $\rho$ is $-1/\sqrt{2}$.
+
+### Compute the functions $b$ and $s$ that specify the CIUUPI 
+
+
+### `bs_ciuupi` 
+
+The function `bs_ciuupi` is the "engine" of the package.
+The CIUUPI is required to have minimum coverage probability $1 - \alpha$, for some
+$\alpha$ specified by the user of the package. 
+The functions $b$ and $s$ of the CIUUPI are determined by $\alpha$ and $\rho$. 
+Suppose that $\alpha = 0.05$.
+The functions $b$ and $s$ can be specified either by natural cubic spline interpolation
+(natural=1) or by clamped cubic spline interpolation (natural=0). By default, natural=1.
+For this default, the list that specifies the functions $b$ and $s$ of the CIUUPI is computed using the following command
+
+bs.list.example <- bs_ciuupi(alpha, rho)
+
+This command takes about 5 minutes to run and so `bs.list.example`
+has been stored as data for quick access. 
+
+We can specify the functions $b$ and $s$ by clamped cubic spline interpolation as follows.
+The list that specifies the functions $b$ and $s$ of the CIUUPI is computed using the following command
+
+bs_ciuupi(alpha, rho, natural = 0)
+
+This command takes about 45 minutes to run and leads to almost identical functions $b$ and $s$ of the CIUUPI as when bs_ciuupi(alpha, rho) is used.
+
+The output of `bs_ciuupi` is a list that includes the element bsvec, which is the vector 
+$$\Big(b(h),...,b((q-1)h), s(0),s(h)...,s((q-1)h)\Big)$$
+that, using cubic spline interpolation, determines the functions $b$ and $s$ that specify
+the CIUUPI for all possible values of 
+$\sigma$ and observed response vector $y$.
+We
+stress that bsvec does NOT depend on either $\sigma$ or the observed response vector $y$. The graphs of the functions $b$ and $s$ are plotted using the functions `plot_b` and `plot_s`, respectively. 
+
+
+### Plot the graphs of the functions $b$ and $s$ 
+
+
+### `plot_b` and `plot_s`
+
+We plot the graph of the odd function $b$ of the CIUUPI using
+
+```{r, fig.align='center', fig.width=5, fig.height=4}
+plot_b(bs.list.example)
+```
+
+We plot of the graph of the even function $s$ of the CIUUPI using
+
+```{r, fig.align='center', fig.width=5, fig.height=4}
+plot_s(bs.list.example)
+```
+
+### The performance of the CIUUPI 
+
+Define the scaled expected length of the CIUUPI to be the expected length of the CIUUPI divided by the expected length of the standard $1 - \alpha$ confidence interval for $\theta$, given by
+$$
+\left[ \hat{\theta} - z_{1-\alpha/2} \, v_{\theta}^{1/2} \, \sigma, \, \hat{\theta} + z_{1-\alpha/2} \, v_{\theta}^{1/2} \, \sigma \right].
+$$
+The performance of the CIUUPI is assessed by its coverage probability and its squared scaled expected length.
+
+
+### `plot_cp` and `plot_squared_sel`
+
+The coverage probability of the CIUUPI is an even function of the 
+unknown parameter $\gamma$.
+We plot the graph of the coverage probability minus $1 - \alpha$, as a function 
+of $|\gamma|$, using
+
+```{r, fig.align="center", fig.width=5, fig.height=4}
+plot_cp(bs.list.example)
+```
+
+The scaled expected length of the CIUUPI is an even function of the 
+unknown parameter $\gamma$. The squared scaled expected length
+may be interpreted as the following measure of efficiency
+of the standard $1-\alpha$ confidence interval for $\theta$ 
+relative to the CIUUPI with minimum coverage $1-\alpha$. For a given large 
+sample size used to find the the standard $1-\alpha$
+confidence interval for $\theta$, it is the sample size required 
+by the CIUUPI with minimum coverage
+$1-\alpha$ divided by the sample size used to find the standard $1-\alpha$
+confidence interval for $\theta$ to achieve the same expected length, for 
+the specified value of $\gamma$.
+
+We plot the graph of the squared scaled expected length, as a function 
+of $|\gamma|$, using
+
+```{r, fig.align="center", fig.width=5, fig.height=4}
+plot_squared_sel(bs.list.example)
+```
+### Computation of the observed value of the CIUUPI
+
+Now we introduce the additional information provided by $\sigma^2$ and the 
+observed response vector $y$. This permits us to compute the observed value
+of the CIUUPI and also to compute the standard $1 - \alpha$ confidence interval
+for $\theta$. 
+
+### `ciuupi_observed_value` and `ci_standard`
+
+For this example, the observed response vector $y$ is (87.2, 88.4, 86.7, 89.2)
+and the known value of $\sigma$ is 0.8. We specify these values using the following 
+commands
+
+```{r}
+y <- c(87.2, 88.4, 86.7, 89.2)
+sig <- 0.8
+```
+
+The uncertain prior information is that $\tau = 0$, where $\tau = c^{\top} \beta - t$,
+with $t = 0$. 
+The observed value of the CIUUPI is computed and printed using the following commands
+
+```{r}
+alpha <- 0.05
+t <- 0
+ciuupi_observed_value(a, c, X, alpha, bs.list.example, t, y, sig = sig)
+```
+
+For comparison, the standard $1-\alpha$ confidence interval for $\theta$, with $\alpha = 0.05$, is computed and printed using the following commands
+
+
+
+```{r}
+alpha <- 0.05
+ci_standard(a, X, y, alpha, sig)
+```
+
+
+
+
+
+## References
+Box, G.E.P., Connor, L.R., Cousins, W.R., Davies, O.L., Hinsworth, F.R., Sillitto, G.P. (1963)
+The Design and Analysis
+of Industrial Experiments, 2nd edition, reprinted. Oliver and Boyd, London.
+
+Kabaila, P. and Mainzer, R. (2019). An alternative to confidence intervals constructed after a Hausman pretest in panel data. <doi:10.1111/anzs.12278>
+
+Mainzer, R. and Kabaila, P. (2019).  ciuupi: An R package for
+computing confidence intervals that utilize uncertain prior information. <doi:10.32614/RJ-2019-026>
+
+
